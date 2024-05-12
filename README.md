@@ -37,11 +37,11 @@ A trigger is implemented to update the inventory when orders are placed.
 
 The backend system for order and inventory management implements dynamic pricing based on demand and availability. It adheres to the following key features:
 
--Clean Architecture for maintainability and scalability.
--PostgreSQL for efficient data storage.
--Gin Framework for API development.
--JWT for secure authentication and authorization.
--Dependency Injection and Compile-Time Dependency Injection for flexible component integration.
+- Clean Architecture for maintainability and scalability.
+- PostgreSQL for efficient data storage.
+- Gin Framework for API development.
+- JWT for secure authentication and authorization.
+- Dependency Injection and Compile-Time Dependency Injection for flexible component integration.
 ### Additional Features
 
 Refresh Token and Access Token: Implemented secure authentication using JWT (JSON Web Tokens) for both access and refresh tokens. This ensures enhanced security and improved user experience by allowing seamless access to protected resources.
@@ -68,7 +68,7 @@ Getting Started
 
 
 
-
+```bash
 Install and set up PostgreSQL.
     Create a dev.env file in the /pkg/config directory.
     Add PostgreSQL details to the dev.env file:
@@ -80,7 +80,7 @@ Install and set up PostgreSQL.
     Add a secret hash key to the dev.env file:
         KEY: your secret hash key.
     Run go run cmd/main.go in the terminal.
-
+```
 APIs
 ### User
 
