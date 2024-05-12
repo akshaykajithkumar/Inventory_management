@@ -19,12 +19,12 @@ type ServerHTTP struct {
 NewServerHTTP creates a new instance of ServerHTTP.
 
 Parameters:
-- categoryHandler: A handler for category-related operations.
+
 - inventoryHandler: A handler for inventory-related operations.
 - userHandler: A handler for user-related operations.
-- otpHandler: A handler for OTP-related operations.
+
 - adminHandler: A handler for admin-related operations.
-- cartHandler: A handler for cart-related operations.
+
 - orderHandler: A handler for order-related operations.
 
 Returns:
@@ -36,9 +36,8 @@ func NewServerHTTP(inventoryHandler *handler.InventoryHandler, userHandler *hand
 
 	engine.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
-	routes.UserRoutes(engine.Group("/users"), userHandler, inventoryHandler, orderHandler)
-	routes.AdminRoutes(engine.Group("/admin"), adminHandler, inventoryHandler, orderHandler)
-	routes.InventoryRoutes(engine.Group("/products"), inventoryHandler)
+	routes.UserRoutes(engine.Group("/users"), userHandler, orderHandler, inventoryHandler)
+	routes.AdminRoutes(engine.Group("/admin"), adminHandler, inventoryHandler)
 
 	return &ServerHTTP{engine: engine}
 }
@@ -49,7 +48,4 @@ Start starts the HTTP server and listens on port 1243.
 func (sh *ServerHTTP) Start() {
 	sh.engine.Run(":1233")
 
-	// if err != nil {
-	//   log.Fatal("ListenAndServeTLS: ", err)
-	//}
 }

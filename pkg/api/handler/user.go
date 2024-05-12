@@ -85,103 +85,22 @@ func (i *UserHandler) SignUp(c *gin.Context) {
 
 }
 
-// // @Summary		Add quantity in cart by one
-// // @Description	user can add 1 quantity of product to their cart
-// // @Tags			User
-// // @Accept			json
-// // @Produce		    json
-// // @Param			inventory	query	string	true	"inventory id"
-// // @Security		Bearer
-// // @Success		200	{object}	response.Response{}
-// // @Failure		500	{object}	response.Response{}
-// // @Router			/users/cart/updateQuantity/plus [put]
-// func (i *UserHandler) UpdateQuantityAdd(c *gin.Context) {
-// 	id, err := helper.GetUserID(c)
-// 	if err != nil {
-// 		errorRes := response.ClientResponse(http.StatusBadRequest, "Could not get userID", nil, err.Error())
-// 		c.JSON(http.StatusBadRequest, errorRes)
-// 		return
-// 	}
-
-// 	cartID, err := i.userUseCase.GetCartID(id)
-// 	if err != nil {
-// 		errorRes := response.ClientResponse(http.StatusBadRequest, "check parameters properly", nil, err.Error())
-// 		c.JSON(http.StatusBadRequest, errorRes)
-// 		return
-// 	}
-
-// 	inv, err := strconv.Atoi(c.Query("inventory"))
-// 	if err != nil {
-// 		errorRes := response.ClientResponse(http.StatusBadRequest, "check parameters properly", nil, err.Error())
-// 		c.JSON(http.StatusBadRequest, errorRes)
-// 		return
-// 	}
-
-// 	if err := i.userUseCase.UpdateQuantityAdd(cartID, inv); err != nil {
-// 		errorRes := response.ClientResponse(http.StatusBadRequest, "could not Add the quantity", nil, err.Error())
-// 		c.JSON(http.StatusBadRequest, errorRes)
-// 		return
-// 	}
-
-// 	successRes := response.ClientResponse(http.StatusOK, "Successfully added quantity", nil, nil)
-// 	c.JSON(http.StatusOK, successRes)
-// }
-
-// // @Summary		Subtract quantity in cart by one
-// // @Description	user can subtract 1 quantity of product from their cart
-// // @Tags			User
-// // @Accept			json
-// // @Produce		    json
-// // @Param			inventory	query	string	true	"inventory id"
-// // @Security		Bearer
-// // @Success		200	{object}	response.Response{}
-// // @Failure		500	{object}	response.Response{}
-// // @Router			/users/cart/updateQuantity/minus [put]
-// func (i *UserHandler) UpdateQuantityLess(c *gin.Context) {
-// 	id, err := helper.GetUserID(c)
-// 	if err != nil {
-// 		errorRes := response.ClientResponse(http.StatusBadRequest, "Could not get userID", nil, err.Error())
-// 		c.JSON(http.StatusBadRequest, errorRes)
-// 		return
-// 	}
-
-// 	cartID, err := i.userUseCase.GetCartID(id)
-// 	if err != nil {
-// 		errorRes := response.ClientResponse(http.StatusBadRequest, "check parameters properly", nil, err.Error())
-// 		c.JSON(http.StatusBadRequest, errorRes)
-// 		return
-// 	}
-
-// 	inv, err := strconv.Atoi(c.Query("inventory"))
-// 	if err != nil {
-// 		errorRes := response.ClientResponse(http.StatusBadRequest, "check parameters properly", nil, err.Error())
-// 		c.JSON(http.StatusBadRequest, errorRes)
-// 		return
-// 	}
-
-// 	if err := i.userUseCase.UpdateQuantityLess(cartID, inv); err != nil {
-// 		errorRes := response.ClientResponse(http.StatusBadRequest, "could not  subtract quantity", nil, err.Error())
-// 		c.JSON(http.StatusBadRequest, errorRes)
-// 		return
-// 	}
-
-// 	successRes := response.ClientResponse(http.StatusOK, "Successfully subtracted quantity", nil, nil)
-// 	c.JSON(http.StatusOK, successRes)
-// }
-
-// Login is a handler for user login
+// Logout is a handler for user logout
 // @Summary		User Logout
-// @Description	user can log in by giving their details
+// @Description	Logout the currently authenticated user
 // @Tags			User
-// @Accept			json
-// @Produce		    json
+// @Accept		json
+// @Produce		json
+// @Security		Bearer
 // @Success		200	{object}	response.Response{}
 // @Failure		500	{object}	response.Response{}
 // @Router			/users/logout [post]
 func (i *UserHandler) Logout(c *gin.Context) {
 
+	// Clear the access token and refresh token cookies
+	c.SetCookie("Authorization", "", -1, "/", "", false, true)
+	c.SetCookie("Refreshtoken", "", -1, "/", "", false, true)
+
 	successRes := response.ClientResponse(http.StatusOK, "User successfully logged out", nil, nil)
-	//c.SetCookie("Authorization", userDetails.Token, 3600, "/", "main.online", true, false)
-	c.SetCookie("Authorization", "", -1, "", "", true, false)
 	c.JSON(http.StatusOK, successRes)
 }

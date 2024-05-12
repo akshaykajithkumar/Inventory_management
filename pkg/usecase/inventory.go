@@ -60,84 +60,24 @@ func (i *inventoryUseCase) DeleteInventory(inventoryID string) error {
 
 }
 
-// func (i *inventoryUseCase) ShowIndividualProducts(id string) (models.InventoryDetails, error) {
-
-// 	product, err := i.repository.ShowIndividualProducts(id)
-// 	if err != nil {
-// 		return models.InventoryDetails{}, err
-// 	}
-// 	productID, err := strconv.Atoi(id)
-// 	if err != nil {
-// 		return models.InventoryDetails{}, err
-// 	}
-// 	var AdditionalImages []models.ImageInfo
-// 	AdditionalImages, err = i.repository.GetImagesFromInventoryID(productID)
-// 	if err != nil {
-// 		return models.InventoryDetails{}, err
-// 	}
-// 	InvDetails := models.InventoryDetails{Inventory: product, AdditionalImages: AdditionalImages}
-
-// 	return InvDetails, nil
-
-// }
-
-func (i *inventoryUseCase) ListProducts(page int, limit int) ([]models.InventoryList, error) {
-
-	productDetails, err := i.repository.ListProducts(page, limit)
-	if err != nil {
-		return []models.InventoryList{}, err
-	}
-	return productDetails, nil
-
-}
-
-func (i *inventoryUseCase) SearchProducts(key string, page, limit int, sortBY string) ([]models.InventoryList, error) {
+func (i *inventoryUseCase) SearchProducts(key string, page, limit int, sortBY string) ([]domain.Inventory, error) {
 
 	productDetails, err := i.repository.SearchProducts(key, page, limit, sortBY)
 	if err != nil {
-		return []models.InventoryList{}, err
+		return []domain.Inventory{}, err
 	}
 
 	return productDetails, nil
 
 }
 
-func (i *orderUseCase) PlaceOrder(userID, productID, quantity int) error {
-	// Check if the product exists
-	product, err := i.orderRepository.GetProductByID(productID)
+func (i *inventoryUseCase) GetInventoryByID(inventoryID string) (domain.Inventory, error) {
+	// Call the repository function to fetch the inventory details by ID
+	inventory, err := i.repository.GetInventoryByID(inventoryID)
 	if err != nil {
-		return err
-	}
-	if product == nil {
-		return errors.New("product not found")
+		return domain.Inventory{}, err
 	}
 
-	// Check if the quantity is available
-	if quantity > product.Quantity {
-		return errors.New("insufficient quantity available")
-	}
-
-	// Create the order
-	order := domain.Order{
-		UserID:    userID,
-		ProductID: productID,
-		Quantity:  quantity,
-		Status:    "PENDING", // Assuming the initial status is pending
-	}
-
-	// Call the repository to save the order
-	err = i.orderRepository.CreateOrder(&order)
-	if err != nil {
-		return err
-	}
-
-	// Update the product quantity
-	product.Quantity -= quantity
-	err = i.orderRepository.UpdateProduct(product)
-	if err != nil {
-
-		return err
-	}
-
-	return nil
+	// Return the fetched inventory details
+	return inventory, nil
 }

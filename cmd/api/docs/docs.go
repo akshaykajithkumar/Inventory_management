@@ -169,7 +169,7 @@ const docTemplate = `{
                         "Bearer": []
                     }
                 ],
-                "description": "Admin can update stock of the inventories",
+                "description": "Admin can update inventories",
                 "consumes": [
                     "application/json"
                 ],
@@ -214,6 +214,40 @@ const docTemplate = `{
                 }
             }
         },
+        "/admin/inventory/stats": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Fetch inventory statistics and return them as JSON.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Get Inventory Statistics",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/admin/logout": {
             "post": {
                 "description": "admin can logout",
@@ -236,6 +270,40 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/order/stats": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Fetch order statistics and return them as JSON.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Get Order Statistics",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
@@ -297,61 +365,28 @@ const docTemplate = `{
                 }
             }
         },
-        "/admin/sales/annual": {
+        "/admin/orders/{id}": {
             "get": {
                 "security": [
                     {
                         "Bearer": []
                     }
                 ],
-                "description": "Admin can view the weekly sales Report",
+                "description": "Get a specific order by its ID",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Admin"
                 ],
-                "summary": "Admin Sales Report",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/admin/sales/custom": {
-            "post": {
-                "security": [
-                    {
-                        "Bearer": []
-                    }
-                ],
-                "description": "Admin can view the weekly sales Report",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Admin"
-                ],
-                "summary": "Admin Sales Report",
+                "summary": "Get Specific Order",
                 "parameters": [
                     {
-                        "description": "custom dates",
-                        "name": "customDates",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.CustomDates"
-                        }
+                        "type": "string",
+                        "description": "Order ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -361,8 +396,14 @@ const docTemplate = `{
                             "$ref": "#/definitions/response.Response"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
@@ -370,21 +411,40 @@ const docTemplate = `{
                 }
             }
         },
-        "/admin/sales/daily": {
-            "get": {
+        "/admin/orders/{id}/status": {
+            "put": {
                 "security": [
                     {
                         "Bearer": []
                     }
                 ],
-                "description": "Admin can view the daily sales Report",
+                "description": "Change the status of a specific order",
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Admin"
                 ],
-                "summary": "Admin Sales Report",
+                "summary": "Change Order Status",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Order ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "New status",
+                        "name": "status",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -392,8 +452,14 @@ const docTemplate = `{
                             "$ref": "#/definitions/response.Response"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
@@ -401,21 +467,24 @@ const docTemplate = `{
                 }
             }
         },
-        "/admin/sales/monthly": {
+        "/admin/user/stats": {
             "get": {
                 "security": [
                     {
                         "Bearer": []
                     }
                 ],
-                "description": "Admin can view the weekly sales Report",
+                "description": "Fetch user statistics and return them as JSON.",
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Admin"
                 ],
-                "summary": "Admin Sales Report",
+                "summary": "Get User Statistics",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -423,39 +492,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/response.Response"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/admin/sales/weekly": {
-            "get": {
-                "security": [
-                    {
-                        "Bearer": []
-                    }
-                ],
-                "description": "Admin can view the weekly sales Report",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Admin"
-                ],
-                "summary": "Admin Sales Report",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
@@ -521,26 +559,44 @@ const docTemplate = `{
                 }
             }
         },
-        "/users/check-out/order/download-invoice": {
+        "/users/inventories/view/{id}": {
             "get": {
                 "security": [
                     {
                         "Bearer": []
                     }
                 ],
-                "description": "Download the invoice PDF file",
+                "description": "View details of an inventory by ID",
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
-                    "application/octet-stream"
+                    "application/json"
                 ],
                 "tags": [
-                    "User"
+                    "Inventory"
                 ],
-                "summary": "Download Invoice PDF",
+                "summary": "View Inventory",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Inventory ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "file"
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -588,7 +644,12 @@ const docTemplate = `{
         },
         "/users/logout": {
             "post": {
-                "description": "user can log in by giving their details",
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Logout the currently authenticated user",
                 "consumes": [
                     "application/json"
                 ],
@@ -665,14 +726,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/users/profile/orders/cancel": {
+        "/users/profile/orders/place": {
             "post": {
                 "security": [
                     {
                         "Bearer": []
                     }
                 ],
-                "description": "user can cancel the orders",
+                "description": "user can place orders",
                 "consumes": [
                     "application/json"
                 ],
@@ -682,12 +743,19 @@ const docTemplate = `{
                 "tags": [
                     "User"
                 ],
-                "summary": "Order Cancel",
+                "summary": "Place Order",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "order id",
-                        "name": "orderid",
+                        "type": "integer",
+                        "description": "product id",
+                        "name": "productid",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "quantity",
+                        "name": "quantity",
                         "in": "query",
                         "required": true
                     }
@@ -766,23 +834,9 @@ const docTemplate = `{
                 }
             }
         },
-        "models.CustomDates": {
-            "type": "object",
-            "properties": {
-                "endDate": {
-                    "type": "string"
-                },
-                "startingDate": {
-                    "type": "string"
-                }
-            }
-        },
         "models.UpdateInventory": {
             "type": "object",
             "properties": {
-                "category_id": {
-                    "type": "integer"
-                },
                 "description": {
                     "type": "string"
                 },

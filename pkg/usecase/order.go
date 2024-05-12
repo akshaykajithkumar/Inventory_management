@@ -2,14 +2,10 @@ package usecase
 
 import (
 	"errors"
-	"fmt"
 	domain "main/pkg/domain"
-	"main/pkg/helper"
 
 	interfaces "main/pkg/repository/interface"
 	services "main/pkg/usecase/interface"
-	"main/pkg/utils/models"
-	"time"
 )
 
 type orderUseCase struct {
@@ -23,6 +19,34 @@ func NewOrderUseCase(repo interfaces.OrderRepository, userUseCase services.UserU
 		userUseCase:     userUseCase,
 	}
 }
+func (i *orderUseCase) PlaceOrder(userID, productID, quantity int) error {
+	// Check if the product exists
+	_, err := i.orderRepository.GetProductByID(productID)
+	if err != nil {
+		return err
+	}
+
+	available, err := i.orderRepository.CheckProductAvailability(productID, quantity)
+	if err != nil {
+		return err
+	}
+	if !available {
+		return errors.New("insufficient quantity available")
+	}
+
+	// Get the price of the product
+	price, err := i.orderRepository.FindAmountFromProductID(productID)
+	if err != nil {
+		return errors.New("price not found")
+	}
+
+	// Call the repository to place the order
+	if err := i.orderRepository.PlaceOrder(userID, productID, quantity, price); err != nil {
+		return err
+	}
+
+	return nil
+}
 
 func (i *orderUseCase) GetOrders(id, page, limit int) ([]domain.Order, error) {
 
@@ -32,342 +56,5 @@ func (i *orderUseCase) GetOrders(id, page, limit int) ([]domain.Order, error) {
 	}
 
 	return orders, nil
-
-}
-
-// func (i *orderUseCase) OrderItemsFromCart(userid int, order models.Order, coupon string) (string, error) {
-// 	//change cart
-// 	cart, err := i.userUseCase.GetCart(userid, 0, 0)
-// 	if err != nil {
-// 		return "", err
-// 	}
-
-// 	var total float64
-// 	for _, v := range cart {
-// 		total = total + v.DiscountedPrice
-// 	}
-// 	fmt.Println("Total without coupon", total)
-// 	if coupon != "" && coupon != " " {
-// 		valid, err := i.couponRepo.ValidateCoupon(coupon)
-// 		if err != nil || !valid {
-// 			return "Invalid Coupon", err
-// 		}
-
-// 		//finding discount if any
-// 		DiscountRate := i.couponRepo.FindCouponDiscount(coupon)
-
-// 		if DiscountRate > 0 {
-// 			totalDiscount := total * float64(DiscountRate) / 100.00
-// 			fmt.Println("Discount", DiscountRate, "Total discount", totalDiscount, (DiscountRate / 100), int(total), int(DiscountRate/100))
-// 			total = total - totalDiscount
-// 		}
-// 	}
-
-// 	fmt.Println("Total amount", total)
-// 	var invoiceItems []*internal.InvoiceData
-// 	for _, v := range cart {
-// 		inventory, err := internal.NewInvoiceData(v.ProductName, int(v.Quantity), (v.DiscountedPrice))
-// 		if err != nil {
-// 			panic(err)
-// 		}
-// 		invoiceItems = append(invoiceItems, inventory)
-// 	}
-// 	// Create single invoice
-// 	invoice := internal.CreateInvoice("main", "www.main.online", invoiceItems)
-// 	internal.GenerateInvoicePdf(*invoice)
-// 	fmt.Printf("The Total Invoice Amount is: %f", invoice.CalculateInvoiceTotalAmount())
-
-// 	//COD
-// 	if order.PaymentID == 1 {
-// 		order_id, err := i.orderRepository.OrderItems(userid, order, total)
-// 		if err != nil {
-// 			return "", err
-// 		}
-
-// 		if err := i.orderRepository.AddOrderProducts(order_id, cart); err != nil {
-// 			return "", err
-// 		}
-// 		cartID, _ := i.userUseCase.GetCartID(userid)
-// 		if err := i.userUseCase.ClearCart(cartID); err != nil {
-// 			return "", err
-// 		}
-
-// 	} else if order.PaymentID == 2 {
-// 		// razorpay
-// 		order_id, err := i.orderRepository.OrderItems(userid, order, total)
-// 		if err != nil {
-// 			return "", err
-// 		}
-
-// 		if err := i.orderRepository.AddOrderProducts(order_id, cart); err != nil {
-// 			return "", err
-// 		}
-// 		link := fmt.Sprintf("https://main.online/users/payment/razorpay?id=%d", order_id)
-// 		return link, err
-// 	}
-
-// 	if order.PaymentID == 4 {
-// 		order_id, err := i.orderRepository.OrderItems(userid, order, total)
-// 		if err != nil {
-// 			return "", err
-// 		}
-
-// 		if err := i.orderRepository.AddOrderProducts(order_id, cart); err != nil {
-// 			return "", err
-// 		}
-
-// 		walletID, err := i.walletRepo.FindWalletIdFromUserID(userid)
-// 		if err != nil {
-// 			return "", err
-// 		}
-// 		bal, err := i.walletRepo.GetBalance(walletID)
-// 		if err != nil {
-// 			return "", err
-// 		}
-// 		if float64(bal) < total {
-// 			return "Insufficient Balance on wallet", errors.New("insufficient balance")
-// 		}
-
-// 		newBal, err := i.walletRepo.PayFromWallet(userid, order_id, total)
-// 		if err != nil {
-// 			return "", err
-// 		}
-
-// 		i.walletRepo.AddHistory(int(total*-1), walletID, "Placed order")
-
-// 		cartID, _ := i.userUseCase.GetCartID(userid)
-// 		if err := i.userUseCase.ClearCart(cartID); err != nil {
-// 			return "", err
-// 		}
-// 		return fmt.Sprintf("%f Rs paid from Wallet. New Balance is %f", total, newBal), nil
-
-// 	}
-
-// 	return "", nil
-
-// }
-
-// func (i *orderUseCase) EditOrderStatus(status string, id int) error {
-
-// 	err := i.orderRepository.EditOrderStatus(status, id)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	return nil
-
-// }
-
-// func (i *orderUseCase) MarkAsPaid(orderID int) error {
-
-// 	err := i.orderRepository.MarkAsPaid(orderID)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	return nil
-
-// }
-
-func (i *orderUseCase) AdminOrders(page, limit int, status string) ([]domain.OrderDetails, error) {
-
-	if status != "PENDING" && status != "SHIPPED" && status != "CANCELED" && status != "RETURNED" && status != "DELIVERED" {
-		return []domain.OrderDetails{}, errors.New("invalid status type")
-
-	}
-	orders, err := i.orderRepository.AdminOrders(page, limit, status)
-	if err != nil {
-		return []domain.OrderDetails{}, err
-	}
-
-	return orders, nil
-
-}
-
-func (i *orderUseCase) DailyOrders() (domain.SalesReport, error) {
-	var SalesReport domain.SalesReport
-	endDate := time.Now()
-	startDate := time.Date(endDate.Year(), endDate.Month(), endDate.Day(), 0, 0, 0, 0, time.UTC)
-	SalesReport.Orders, _ = i.orderRepository.GetOrdersInRange(startDate, endDate)
-	SalesReport.TotalOrders = len(SalesReport.Orders)
-	total := 0.0
-	for _, v := range SalesReport.Orders {
-		total += v.Price
-	}
-	SalesReport.TotalRevenue = total
-
-	products, err := i.orderRepository.GetProductsQuantity()
-	if err != nil {
-		return domain.SalesReport{}, err
-	}
-	bestSellerIDs := helper.FindMostBoughtProduct(products)
-	var bestSellers []string
-	for _, v := range bestSellerIDs {
-		product, err := i.orderRepository.GetProductNameFromID(v)
-		if err != nil {
-			return domain.SalesReport{}, err
-		}
-		bestSellers = append(bestSellers, product)
-	}
-	SalesReport.BestSellers = bestSellers
-
-	return SalesReport, nil
-}
-
-func (i *orderUseCase) WeeklyOrders() (domain.SalesReport, error) {
-	var SalesReport domain.SalesReport
-	endDate := time.Now()
-	startDate := endDate.Add(-time.Duration(endDate.Weekday()) * 24 * time.Hour)
-	SalesReport.Orders, _ = i.orderRepository.GetOrdersInRange(startDate, endDate)
-	SalesReport.TotalOrders = len(SalesReport.Orders)
-	total := 0.0
-	for _, v := range SalesReport.Orders {
-		total += v.Price
-	}
-	SalesReport.TotalRevenue = total
-
-	products, err := i.orderRepository.GetProductsQuantity()
-	if err != nil {
-		return domain.SalesReport{}, err
-	}
-	bestSellerIDs := helper.FindMostBoughtProduct(products)
-	var bestSellers []string
-	for _, v := range bestSellerIDs {
-		product, err := i.orderRepository.GetProductNameFromID(v)
-		if err != nil {
-			return domain.SalesReport{}, err
-		}
-		bestSellers = append(bestSellers, product)
-	}
-	SalesReport.BestSellers = bestSellers
-
-	return SalesReport, nil
-}
-
-func (i *orderUseCase) MonthlyOrders() (domain.SalesReport, error) {
-	var SalesReport domain.SalesReport
-	endDate := time.Now()
-	startDate := time.Date(endDate.Year(), endDate.Month(), 1, 0, 0, 0, 0, time.UTC)
-	SalesReport.Orders, _ = i.orderRepository.GetOrdersInRange(startDate, endDate)
-	SalesReport.TotalOrders = len(SalesReport.Orders)
-	total := 0.0
-	for _, v := range SalesReport.Orders {
-		total += v.Price
-	}
-	SalesReport.TotalRevenue = total
-
-	products, err := i.orderRepository.GetProductsQuantity()
-	if err != nil {
-		return domain.SalesReport{}, err
-	}
-	bestSellerIDs := helper.FindMostBoughtProduct(products)
-	var bestSellers []string
-	for _, v := range bestSellerIDs {
-		product, err := i.orderRepository.GetProductNameFromID(v)
-		if err != nil {
-			return domain.SalesReport{}, err
-		}
-		bestSellers = append(bestSellers, product)
-	}
-	SalesReport.BestSellers = bestSellers
-	return SalesReport, nil
-}
-
-func (i *orderUseCase) AnnualOrders() (domain.SalesReport, error) {
-	var SalesReport domain.SalesReport
-	endDate := time.Now()
-	startDate := time.Date(endDate.Year(), 1, 1, 0, 0, 0, 0, time.UTC)
-	SalesReport.Orders, _ = i.orderRepository.GetOrdersInRange(startDate, endDate)
-	SalesReport.TotalOrders = len(SalesReport.Orders)
-	total := 0.0
-	for _, v := range SalesReport.Orders {
-		total += v.Price
-	}
-	SalesReport.TotalRevenue = total
-
-	products, err := i.orderRepository.GetProductsQuantity()
-	if err != nil {
-		return domain.SalesReport{}, err
-	}
-	bestSellerIDs := helper.FindMostBoughtProduct(products)
-	var bestSellers []string
-	for _, v := range bestSellerIDs {
-		product, err := i.orderRepository.GetProductNameFromID(v)
-		if err != nil {
-			return domain.SalesReport{}, err
-		}
-		bestSellers = append(bestSellers, product)
-	}
-	SalesReport.BestSellers = bestSellers
-
-	return SalesReport, nil
-}
-
-func (i *orderUseCase) CustomDateOrders(dates models.CustomDates) (domain.SalesReport, error) {
-	var SalesReport domain.SalesReport
-	endDate := dates.EndDate
-	startDate := dates.StartingDate
-	SalesReport.Orders, _ = i.orderRepository.GetOrdersInRange(startDate, endDate)
-	SalesReport.TotalOrders = len(SalesReport.Orders)
-	total := 0.0
-	for _, v := range SalesReport.Orders {
-		total += v.Price
-	}
-	SalesReport.TotalRevenue = total
-
-	products, err := i.orderRepository.GetProductsQuantity()
-	if err != nil {
-		return domain.SalesReport{}, err
-	}
-	bestSellerIDs := helper.FindMostBoughtProduct(products)
-	var bestSellers []string
-	for _, v := range bestSellerIDs {
-		product, err := i.orderRepository.GetProductNameFromID(v)
-		if err != nil {
-			return domain.SalesReport{}, err
-		}
-		bestSellers = append(bestSellers, product)
-	}
-	SalesReport.BestSellers = bestSellers
-
-	return SalesReport, nil
-}
-
-func (i *orderUseCase) CancelOrder(id, orderid int) error {
-
-	//should check if the order is already returned peoples will misuse this security breach
-	// and will get  unlimited money into their wallet
-	status, err := i.orderRepository.CheckOrderStatus(orderid)
-	if err != nil {
-		return err
-	}
-	fmt.Println(status)
-	if status == "CANCELED" {
-		return errors.New("order already cancelled")
-	}
-
-	if status == "DELIVERED" {
-		return errors.New("order already delivered")
-	}
-	//should also check if the order is already returned
-	//or users will also earn money by returning pending orders by opting COD
-
-	if status == "PENDING" || status == "SHIPPED" {
-		fmt.Println("status pending")
-		//make order as returned order
-		if err := i.orderRepository.CancelOrder(orderid); err != nil {
-			return err
-		}
-	}
-
-	//checkif alreadypaid
-	// //paymentStatus, err := i.orderRepository.CheckPaymentStatus(orderid)
-	// fmt.Println(paymentStatus)
-	// if err != nil {
-	// 	return err
-	// }
-	// if paymentStatus != "PAID" {
-	// 	return nil
-	// }
-
-	return nil
 
 }

@@ -17,21 +17,26 @@ func ConnectDatabase(cfg config.Config) (*gorm.DB, error) {
 	})
 
 	db.AutoMigrate(&domain.Inventory{})
-	db.AutoMigrate(&domain.Category{})
+
 	db.AutoMigrate(&domain.User{})
 	db.AutoMigrate(&domain.Admin{})
-	db.AutoMigrate(&domain.Cart{})
-	db.AutoMigrate(&domain.Wishlist{})
-	db.AutoMigrate(&domain.WishlistItems{})
-	db.AutoMigrate(&domain.Address{})
+
 	db.AutoMigrate(&domain.Order{})
 	db.AutoMigrate(&domain.OrderItem{})
-	db.AutoMigrate(&domain.LineItems{})
-	db.AutoMigrate(&domain.PaymentMethod{})
-	db.AutoMigrate(&domain.Offer{})
-	db.AutoMigrate(&domain.Coupon{})
-	db.AutoMigrate(&domain.Wallet{})
-	db.AutoMigrate(&domain.WalletHistory{})
-	db.AutoMigrate(&domain.Image{})
+
+	// // Setup the triggers
+	// if err := db.Exec(placeOrderTriggerSQL).Error; err != nil {
+	// 	log.Printf("failed to setup place_order trigger: %v", err)
+	// 	return nil, err
+	// }
+
+	// if err := db.Exec(adjustPriceTriggerSQL).Error; err != nil {
+	// 	log.Printf("failed to setup adjust_price trigger: %v", err)
+	// 	return nil, err
+	// }
+	// //setup the indexes
+	// if err := CreateIndexes(db); err != nil {
+	// 	log.Printf("failed to setup database indexes")
+	// }
 	return db, dbErr
 }

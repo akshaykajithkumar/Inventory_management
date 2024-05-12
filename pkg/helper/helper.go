@@ -127,13 +127,13 @@ func TokensFromRefreshToken(prevRefreshTokenString string) (string, string, erro
 		return "", "", err
 	}
 
-	// Extract claims from the previous refresh token
+	// Extracting claims from the previous refresh token
 	prevRefreshClaims, ok := prevRefreshToken.Claims.(jwt.MapClaims)
 	if !ok || !prevRefreshToken.Valid {
 		return "", "", errors.New("invalid refresh token")
 	}
 
-	// Use the claims to generate a new access token
+	//  claims to generate a new access token
 	newAccessTokenClaims := &AuthCustomClaims{
 		Id:    uint(prevRefreshClaims["id"].(float64)),
 		Email: prevRefreshClaims["email"].(string),
@@ -150,7 +150,7 @@ func TokensFromRefreshToken(prevRefreshTokenString string) (string, string, erro
 		return "", "", err
 	}
 
-	// Generate a new refresh token for the next cycle
+	// Generating new refresh token for the next cycle
 	newRefreshTokenClaims := &AuthCustomClaims{
 		Id:    uint(prevRefreshClaims["id"].(float64)),
 		Email: prevRefreshClaims["email"].(string),
@@ -223,28 +223,4 @@ func PasswordHashing(password string) (string, error) {
 
 	hash := string(hashedPassword)
 	return hash, nil
-}
-
-func FindMostBoughtProduct(products []domain.ProductReport) []int {
-
-	productMap := make(map[int]int)
-
-	for _, v := range products {
-		productMap[v.InventoryID] += v.Quantity
-	}
-
-	maxQty := 0
-	for _, v := range productMap {
-		if v > maxQty {
-			maxQty = v
-		}
-	}
-
-	var bestSellers []int
-	for k, v := range productMap {
-		if v == maxQty {
-			bestSellers = append(bestSellers, k)
-		}
-	}
-	return bestSellers
 }

@@ -26,7 +26,7 @@ func (c *userDatabase) CheckUserAvailability(email string) bool {
 	if err := c.DB.Raw(query).Scan(&count).Error; err != nil {
 		return false
 	}
-	// if count is greater than 0 that means the user already exist
+
 	return count > 0
 }
 
@@ -71,17 +71,6 @@ func (c *userDatabase) FindUserIDByOrderID(orderID int) (int, error) {
 	return userID, nil
 }
 
-// func (c *userDatabase) SignUp(user models.UserDetails) (models.UserResponse, error) {
-
-// 	var userDetails models.UserResponse
-// 	err := c.DB.Raw("INSERT INTO users (name, email, password, phone, username) VALUES (?, ?, ?, ?,?) RETURNING id, name, email, phone", user.Name, user.Email, user.Password, user.Phone, user.Username).Scan(&userDetails).Error
-
-// 	if err != nil {
-// 		return models.UserResponse{}, err
-// 	}
-
-//		return userDetails, nil
-//	}
 func (c *userDatabase) SignUp(user models.UserDetails) (models.UserResponse, error) {
 
 	var userDetails models.UserResponse

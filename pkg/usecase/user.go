@@ -27,15 +27,6 @@ func (u *userUseCase) Login(user models.UserLogin) (models.TokenUser, error) {
 		return models.TokenUser{}, errors.New("the user does not exist")
 	}
 
-	permission, err := u.userRepo.UserBlockStatus(user.Email)
-	if err != nil {
-		return models.TokenUser{}, err
-	}
-
-	if !permission {
-		return models.TokenUser{}, errors.New("user is blocked by admin")
-	}
-
 	// Get the user details in order to check the password, in this case ( The same function can be reused in future )
 	user_details, err := u.userRepo.FindUserByEmail(user)
 	if err != nil {
@@ -95,57 +86,4 @@ func (u *userUseCase) SignUp(user models.UserDetails) (models.TokenUser, error) 
 		RefreshToken: refreshTokenString,
 		AccessToken:  accessTokenString,
 	}, nil
-}
-
-func (i *userUseCase) EditUser(id int, userData models.EditUser) error {
-
-	if userData.Name != "" && userData.Name != "string" {
-		err := i.userRepo.EditName(id, userData.Name)
-		if err != nil {
-			return err
-		}
-	}
-	if userData.Email != "" && userData.Email != "string" {
-		err := i.userRepo.EditEmail(id, userData.Email)
-		if err != nil {
-			return err
-		}
-	}
-	if userData.Phone != "" && userData.Phone != "string" {
-		err := i.userRepo.EditPhone(id, userData.Phone)
-		if err != nil {
-			return err
-		}
-	}
-	if userData.Username != "" && userData.Username != "string" {
-		err := i.userRepo.EditUsername(id, userData.Username)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-
-}
-
-func (i *userUseCase) UpdateQuantityAdd(id, inv_id int) error {
-
-	err := i.userRepo.UpdateQuantityAdd(id, inv_id)
-	if err != nil {
-		return err
-	}
-
-	return nil
-
-}
-
-func (i *userUseCase) UpdateQuantityLess(id, inv_id int) error {
-
-	err := i.userRepo.UpdateQuantityLess(id, inv_id)
-	if err != nil {
-		return err
-	}
-
-	return nil
-
 }

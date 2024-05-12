@@ -7,41 +7,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func UserRoutes(engine *gin.RouterGroup, userHandler *handler.UserHandler, inventoryHandler *handler.InventoryHandler, orderHandler *handler.OrderHandler) {
+func UserRoutes(engine *gin.RouterGroup, userHandler *handler.UserHandler, orderHandler *handler.OrderHandler, inventoryHandler *handler.InventoryHandler) {
 	engine.POST("/login", userHandler.Login)
 	engine.POST("/signup", userHandler.SignUp)
+	engine.POST("/logout", userHandler.Logout)
 
-	// Auth middleware
 	engine.Use(middleware.UserAuthMiddleware)
 	{
-		engine.POST("/logout", userHandler.Logout)
+		engine.GET("/inventories/view/:id", inventoryHandler.ViewInventory)
 
-		profile := engine.Group("/profile")
-		{
-
-			orders := profile.Group("/orders")
-			{
-				orders.GET("", orderHandler.GetOrders)
-				orders.POST("/cancel", orderHandler.CancelOrder)
-				//orders.POST("/return", orderHandler.ReturnOrder)
-
-			}
-		}
-
-		// cart := engine.Group("/cart")
-		// {
-
-		// cart.PUT("/updateQuantity/plus", userHandler.UpdateQuantityAdd)
-		// cart.PUT("/updateQuantity/minus", userHandler.UpdateQuantityLess)
-
-		// }
-
-		// checkout := engine.Group("/check-out")
-		// {
-		// 	// checkout.GET("", cartHandler.CheckOut)
-		// 	// checkout.POST("/order", orderHandler.OrderItemsFromCart)
-		// 	// checkout.GET("/order/download-invoice", orderHandler.DownloadInvoice)
-		// }
-
+		engine.GET("/profile/orders", orderHandler.GetOrders)
+		engine.POST("/profile/orders/place", orderHandler.PlaceOrder)
 	}
+
+	engine.GET("/products/search", inventoryHandler.SearchProducts)
 }

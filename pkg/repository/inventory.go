@@ -2,6 +2,7 @@ package repository
 
 import (
 	"errors"
+	"main/pkg/domain"
 	interfaces "main/pkg/repository/interface"
 	"main/pkg/utils/models"
 	"strconv"
@@ -19,25 +20,13 @@ func NewInventoryRepository(DB *gorm.DB) interfaces.InventoryRepository {
 	}
 }
 
-// func (i *inventoryRepository) AddInventory(inventory models.Inventory, url string) (models.InventoryResponse, error) {
-// 	var inventoryResponse models.InventoryResponse
-// 	query := `
-//     INSERT INTO inventories (category_id,category product_name,description, stock, price, image)
-//     VALUES (?, ?, ?, ?, ?,?) RETURNING id
-// 	`
-// 	i.DB.Raw(query, inventory.CategoryID, inventory.ProductName, inventory.Description, inventory.Stock, inventory.Price, url).Scan(&inventoryResponse.ProductID)
-
-// 	return inventoryResponse, nil
-
-// }
-
 func (i *inventoryRepository) AddInventory(inventory models.Inventory) (models.InventoryResponse, error) {
 
 	query := `
-    INSERT INTO inventories (category_id, product_name, description, stock, price, image)
-    VALUES (?, ?, ?, ?, ?, ?);
-    `
-	i.DB.Exec(query, inventory.CategoryID, inventory.ProductName, inventory.Description, inventory.Stock, inventory.Price)
+		INSERT INTO inventories (product_name, description, stock, price)
+		VALUES ( ?, ?, ?, ?);
+		`
+	i.DB.Exec(query, inventory.ProductName, inventory.Description, inventory.Stock, inventory.Price)
 
 	var inventoryResponse models.InventoryResponse
 
@@ -66,11 +55,6 @@ func (i *inventoryRepository) UpdateInventory(pid int, invData models.UpdateInve
 		return models.Inventory{}, errors.New("database connection is nil")
 	}
 
-	if invData.CategoryID != 0 {
-		if err := i.DB.Exec("UPDATE inventories SET category_id = ? WHERE id= ?", invData.CategoryID, pid).Error; err != nil {
-			return models.Inventory{}, err
-		}
-	}
 	if invData.ProductName != "" && invData.ProductName != "string" {
 		if err := i.DB.Exec("UPDATE inventories SET product_name = ? WHERE id= ?", invData.ProductName, pid).Error; err != nil {
 			return models.Inventory{}, err
@@ -116,47 +100,6 @@ func (i *inventoryRepository) DeleteInventory(inventoryID string) error {
 	return nil
 }
 
-func (i *inventoryRepository) ShowIndividualProducts(id string) (models.InventoryList, error) {
-	pid, error := strconv.Atoi(id)
-	if error != nil {
-		return models.InventoryList{}, errors.New("convertion not happened")
-	}
-	var product models.InventoryList
-	err := i.DB.Raw(`
-	SELECT inventories.id, inventories.product_name, inventories.description, inventories.stock, inventories.price, inventories.image, categories.category AS category FROM inventories JOIN categories ON inventories.category_id = categories.id
-		WHERE
-			inventories.id = ?
-			`, pid).Scan(&product).Error
-	//SELECT inventories.id, inventories.product_name, inventories.description, inventories.stock, inventories.price, inventories.image, categories.category AS category FROM inventories JOIN categories ON inventories.category_id = categories.id LIMIT ? OFFSET ?", limit, offset
-
-	if err != nil {
-		return models.InventoryList{}, errors.New("error retrieved record")
-	}
-	return product, nil
-
-}
-
-func (ad *inventoryRepository) ListProducts(page int, limit int) ([]models.InventoryList, error) {
-	// pagination purpose -
-	if page == 0 {
-		page = 1
-	}
-	if limit == 0 {
-		limit = 10
-	}
-	offset := (page - 1) * limit
-	var productDetails []models.InventoryList
-
-	if err := ad.DB.Raw("SELECT inventories.id, inventories.product_name, inventories.description, inventories.stock, inventories.price, inventories.image, categories.category AS category FROM inventories JOIN categories ON inventories.category_id = categories.id LIMIT ? OFFSET ?", limit, offset).Scan(&productDetails).Error; err != nil {
-		//"SELECT inventories.product_name,cart_products.quantity,cart_products.total_price AS Total FROM cart_products JOIN inventories ON cart_products.inventory_id=inventories.id WHERE user_id=?"
-
-		return []models.InventoryList{}, err
-	}
-
-	return productDetails, nil
-
-}
-
 func (i *inventoryRepository) CheckStock(pid int) (int, error) {
 	var k int
 	if err := i.DB.Raw("SELECT stock FROM inventories WHERE id=?", pid).Scan(&k).Error; err != nil {
@@ -175,80 +118,65 @@ func (i *inventoryRepository) CheckPrice(pid int) (float64, error) {
 	return k, nil
 }
 
-// func (ad *inventoryRepository) SearchProducts(key string, page, limit int) ([]models.Inventory, error) {
-// 	if page == 0 {
-// 		page = 1
-// 	}
-// 	if limit == 0 {
-// 		limit = 10
-// 	}
-// 	offset := (page - 1) * limit
-// 	var productDetails []models.Inventory
-
-// 	query := `
-// 		SELECT *
-// 		FROM inventories
-// 		WHERE product_name ILIKE '%' || ? || '%'
-// 		OR description ILIKE '%' || ? || '%'
-// 		limit ? offset ?
-// 	`
-
-// 	if err := ad.DB.Raw(query, key, key, limit, offset).Scan(&productDetails).Error; err != nil {
-// 		return []models.Inventory{}, err
-// 	}
-
-//		return productDetails, nil
-//	}
-func (ad *inventoryRepository) SearchProducts(key string, page, limit int, sortBy string) ([]models.InventoryList, error) {
-	if page == 0 {
-		page = 1
-	}
-	if limit == 0 {
-		limit = 10
-	}
+func (a *inventoryRepository) SearchProducts(key string, page, limit int, sortBy string) ([]domain.Inventory, error) {
+	var inventories []domain.Inventory
 	offset := (page - 1) * limit
-	var productDetails []models.InventoryList
 
-	// Define the default sorting order (ASC)
-	sortOrder := "ASC"
-
-	// Validate and set the sorting order based on sortBy input
-	if sortBy == "desc" {
-		sortOrder = "DESC"
-	} // Add more sorting options as needed
-
-	// query := `
-	// 	SELECT *
-	// 	FROM inventories
-	// 	WHERE product_name ILIKE '%' || ? || '%'
-	// 	OR description ILIKE '%' || ? || '%'
-	// 	ORDER BY product_name ` + sortOrder + `
-	// 	LIMIT ? OFFSET ?
-	// `
-	query := `
-	SELECT
-		inventories.id,
-		inventories.product_name,
-		inventories.description,
-		inventories.stock,
-		inventories.price,
-		inventories.image,
-		categories.category AS category
-	FROM
-		inventories
-	JOIN
-		categories
-	ON
-		inventories.category_id = categories.id
-	WHERE
-	product_name ILIKE '%' || ? || '%'
-	 	OR description ILIKE '%' || ? || '%'
-	 	ORDER BY product_name ` + sortOrder + `
-	 	LIMIT ? OFFSET ?
-	 `
-	if err := ad.DB.Raw(query, key, sortOrder, limit, offset).Scan(&productDetails).Error; err != nil {
-		return []models.InventoryList{}, err
+	// Prepare the SQL query
+	var query string
+	if sortBy == "asc" {
+		query = `
+            SELECT i.*
+            FROM inventories i
+            JOIN products p ON i.product_id = p.id
+            WHERE to_tsvector('english', p.product_name) @@ to_tsquery('english', ?)
+            ORDER BY i.price ASC
+            LIMIT ? OFFSET ?
+        `
+	} else if sortBy == "desc" {
+		query = `
+            SELECT i.*
+            FROM inventories i
+            JOIN products p ON i.product_id = p.id
+            WHERE to_tsvector('english', p.product_name) @@ to_tsquery('english', ?)
+            ORDER BY i.price DESC
+            LIMIT ? OFFSET ?
+        `
+	} else {
+		return nil, errors.New("invalid sortBy parameter")
 	}
 
-	return productDetails, nil
+	// Execute the query
+	rows, err := a.DB.Raw(query, key, limit, offset).Rows()
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	// Iterate through the rows and scan each into an Inventory struct
+	for rows.Next() {
+		var inventory domain.Inventory
+		if err := rows.Scan(&inventory.ID, &inventory.ProductName, &inventory.Price, &inventory.Stock); err != nil {
+			return nil, err
+		}
+		inventories = append(inventories, inventory)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return inventories, nil
+}
+func (i *inventoryRepository) GetInventoryByID(inventoryID string) (domain.Inventory, error) {
+
+	var inventory domain.Inventory
+
+	err := i.DB.Raw("SELECT * FROM inventories WHERE id = ?", inventoryID).Scan(&inventory).Error
+	if err != nil {
+		// If there's an error or the inventory doesn't exist, return an empty inventory object and the error
+		return domain.Inventory{}, err
+	}
+
+	return inventory, nil
 }

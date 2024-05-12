@@ -10,17 +10,8 @@ definitions:
     required:
     - email
     type: object
-  models.CustomDates:
-    properties:
-      endDate:
-        type: string
-      startingDate:
-        type: string
-    type: object
   models.UpdateInventory:
     properties:
-      category_id:
-        type: integer
       description:
         type: string
       price:
@@ -163,7 +154,7 @@ paths:
     patch:
       consumes:
       - application/json
-      description: Admin can update stock of the inventories
+      description: Admin can update inventories
       parameters:
       - description: id
         in: query
@@ -192,6 +183,27 @@ paths:
       summary: Update Stock
       tags:
       - Admin
+  /admin/inventory/stats:
+    get:
+      consumes:
+      - application/json
+      description: Fetch inventory statistics and return them as JSON.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Get Inventory Statistics
+      tags:
+      - Admin
   /admin/logout:
     post:
       consumes:
@@ -209,6 +221,27 @@ paths:
           schema:
             $ref: '#/definitions/response.Response'
       summary: admin Logout
+      tags:
+      - Admin
+  /admin/order/stats:
+    get:
+      consumes:
+      - application/json
+      description: Fetch order statistics and return them as JSON.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Get Order Statistics
       tags:
       - Admin
   /admin/orders:
@@ -246,35 +279,15 @@ paths:
       summary: Admin Orders
       tags:
       - Admin
-  /admin/sales/annual:
+  /admin/orders/{id}:
     get:
-      description: Admin can view the weekly sales Report
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/response.Response'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/response.Response'
-      security:
-      - Bearer: []
-      summary: Admin Sales Report
-      tags:
-      - Admin
-  /admin/sales/custom:
-    post:
-      description: Admin can view the weekly sales Report
+      description: Get a specific order by its ID
       parameters:
-      - description: custom dates
-        in: body
-        name: customDates
+      - description: Order ID
+        in: path
+        name: id
         required: true
-        schema:
-          $ref: '#/definitions/models.CustomDates'
+        type: string
       produces:
       - application/json
       responses:
@@ -282,18 +295,35 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/response.Response'
-        "500":
-          description: Internal Server Error
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Not Found
           schema:
             $ref: '#/definitions/response.Response'
       security:
       - Bearer: []
-      summary: Admin Sales Report
+      summary: Get Specific Order
       tags:
       - Admin
-  /admin/sales/daily:
-    get:
-      description: Admin can view the daily sales Report
+  /admin/orders/{id}/status:
+    put:
+      consumes:
+      - application/json
+      description: Change the status of a specific order
+      parameters:
+      - description: Order ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: New status
+        in: query
+        name: status
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -301,18 +331,24 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/response.Response'
-        "500":
-          description: Internal Server Error
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Not Found
           schema:
             $ref: '#/definitions/response.Response'
       security:
       - Bearer: []
-      summary: Admin Sales Report
+      summary: Change Order Status
       tags:
       - Admin
-  /admin/sales/monthly:
+  /admin/user/stats:
     get:
-      description: Admin can view the weekly sales Report
+      consumes:
+      - application/json
+      description: Fetch user statistics and return them as JSON.
       produces:
       - application/json
       responses:
@@ -320,32 +356,13 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/response.Response'
-        "500":
-          description: Internal Server Error
+        "400":
+          description: Bad Request
           schema:
             $ref: '#/definitions/response.Response'
       security:
       - Bearer: []
-      summary: Admin Sales Report
-      tags:
-      - Admin
-  /admin/sales/weekly:
-    get:
-      description: Admin can view the weekly sales Report
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/response.Response'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/response.Response'
-      security:
-      - Bearer: []
-      summary: Admin Sales Report
+      summary: Get User Statistics
       tags:
       - Admin
   /products/search:
@@ -389,21 +406,33 @@ paths:
       summary: Search Products
       tags:
       - Products
-  /users/check-out/order/download-invoice:
+  /users/inventories/view/{id}:
     get:
-      description: Download the invoice PDF file
+      consumes:
+      - application/json
+      description: View details of an inventory by ID
+      parameters:
+      - description: Inventory ID
+        in: path
+        name: id
+        required: true
+        type: string
       produces:
-      - application/octet-stream
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            type: file
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
       security:
       - Bearer: []
-      summary: Download Invoice PDF
+      summary: View Inventory
       tags:
-      - User
+      - Inventory
   /users/login:
     post:
       consumes:
@@ -434,7 +463,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: user can log in by giving their details
+      description: Logout the currently authenticated user
       produces:
       - application/json
       responses:
@@ -446,6 +475,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
       summary: User Logout
       tags:
       - User
@@ -481,17 +512,22 @@ paths:
       summary: Get Orders
       tags:
       - User
-  /users/profile/orders/cancel:
+  /users/profile/orders/place:
     post:
       consumes:
       - application/json
-      description: user can cancel the orders
+      description: user can place orders
       parameters:
-      - description: order id
+      - description: product id
         in: query
-        name: orderid
+        name: productid
         required: true
-        type: string
+        type: integer
+      - description: quantity
+        in: query
+        name: quantity
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
@@ -505,7 +541,7 @@ paths:
             $ref: '#/definitions/response.Response'
       security:
       - Bearer: []
-      summary: Order Cancel
+      summary: Place Order
       tags:
       - User
   /users/signup:

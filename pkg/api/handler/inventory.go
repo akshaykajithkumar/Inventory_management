@@ -36,12 +36,7 @@ func NewInventoryHandler(usecase services.InventoryUseCase) *InventoryHandler {
 func (i *InventoryHandler) AddInventory(c *gin.Context) {
 	//change
 	var inventory models.Inventory
-	categoryID, err := strconv.Atoi(c.Request.FormValue("category_id"))
-	if err != nil {
-		errorRes := response.ClientResponse(http.StatusBadRequest, "form file error", nil, err.Error())
-		c.JSON(http.StatusBadRequest, errorRes)
-		return
-	}
+
 	product_name := c.Request.FormValue("product_name")
 	description := c.Request.FormValue("description")
 	p, err := strconv.Atoi(c.Request.FormValue("price"))
@@ -59,7 +54,7 @@ func (i *InventoryHandler) AddInventory(c *gin.Context) {
 	}
 
 	// Save the uploaded
-	inventory.CategoryID = categoryID
+
 	inventory.ProductName = product_name
 	inventory.Description = description
 	inventory.Price = price
@@ -76,51 +71,8 @@ func (i *InventoryHandler) AddInventory(c *gin.Context) {
 	c.JSON(http.StatusOK, successRes)
 }
 
-// @Summary		Search Products
-// @Description	client can search with a key and get the list of products similar to that key
-// @Tags			Products
-// @Accept		json
-// @Produce		json
-// @Param		page	query  string 	true	"page"
-// @Param		limit	query  string 	true	"limit"
-// @Param		searchkey	query  string 	true	"searchkey"
-// @Param		sortBY	query  string 	false	"sortBY (asc/desc) - Sort by price in ascending (asc) or descending (desc) order"
-// @Success		200	{object}	response.Response{}
-// @Failure		400	{object}	response.Response{}
-// @Router		/products/search [get]
-func (i *InventoryHandler) SearchProducts(c *gin.Context) {
-	pageStr := c.Query("page")
-	page, err := strconv.Atoi(pageStr)
-	if err != nil {
-		errorRes := response.ClientResponse(http.StatusBadRequest, "page number not in the right format", nil, err.Error())
-		c.JSON(http.StatusBadRequest, errorRes)
-		return
-	}
-
-	limitStr := c.Query("limit")
-	limit, err := strconv.Atoi(limitStr)
-	if err != nil {
-		errorRes := response.ClientResponse(http.StatusBadRequest, "limit number not in the right format", nil, err.Error())
-		c.JSON(http.StatusBadRequest, errorRes)
-		return
-	}
-
-	searchKey := c.Query("searchkey")
-	sortBY := c.Query("sortBY") // Add this line to get the sorting parameter
-
-	results, err := i.InventoryUseCase.SearchProducts(searchKey, page, limit, sortBY)
-	if err != nil {
-		errorRes := response.ClientResponse(http.StatusBadRequest, "could not retrieve the records", nil, err.Error())
-		c.JSON(http.StatusBadRequest, errorRes)
-		return
-	}
-
-	successRes := response.ClientResponse(http.StatusOK, "Successfully got all records", results, nil)
-	c.JSON(http.StatusOK, successRes)
-}
-
 // @Summary		Update Stock
-// @Description	Admin can update stock of the inventories
+// @Description	Admin can update inventories
 // @Tags			Admin
 // @Accept			json
 // @Produce		    json
@@ -184,28 +136,72 @@ func (i *InventoryHandler) DeleteInventory(c *gin.Context) {
 
 }
 
-// // @Summary		Show Product Details
-// // @Description	client can view the details of the product
-// // @Tags			Products
-// // @Accept			json
-// // @Produce		    json
-// // @Param			inventoryID	query	string	true	"Inventory ID"
-// // @Security		Bearer
-// // @Success		200	{object}	response.Response{}
-// // @Failure		500	{object}	response.Response{}
-// // @Router			/products/details [get]
-// func (i *InventoryHandler) ShowIndividualProducts(c *gin.Context) {
+// @Summary		Search Products
+// @Description	client can search with a key and get the list of products similar to that key
+// @Tags			Products
+// @Accept		json
+// @Produce		json
+// @Param		page	query  string 	true	"page"
+// @Param		limit	query  string 	true	"limit"
+// @Param		searchkey	query  string 	true	"searchkey"
+// @Param		sortBY	query  string 	false	"sortBY (asc/desc) - Sort by price in ascending (asc) or descending (desc) order"
+// @Success		200	{object}	response.Response{}
+// @Failure		400	{object}	response.Response{}
+// @Router		/products/search [get]
+func (i *InventoryHandler) SearchProducts(c *gin.Context) {
+	pageStr := c.Query("page")
+	page, err := strconv.Atoi(pageStr)
+	if err != nil {
+		errorRes := response.ClientResponse(http.StatusBadRequest, "page number not in the right format", nil, err.Error())
+		c.JSON(http.StatusBadRequest, errorRes)
+		return
+	}
 
-// 	id := c.Query("inventoryID")
-// 	product, err := i.InventoryUseCase.ShowIndividualProducts(id)
+	limitStr := c.Query("limit")
+	limit, err := strconv.Atoi(limitStr)
+	if err != nil {
+		errorRes := response.ClientResponse(http.StatusBadRequest, "limit number not in the right format", nil, err.Error())
+		c.JSON(http.StatusBadRequest, errorRes)
+		return
+	}
 
-// 	if err != nil {
-// 		errorRes := response.ClientResponse(http.StatusBadRequest, "path variables in wrong format", nil, err.Error())
-// 		c.JSON(http.StatusBadRequest, errorRes)
-// 		return
-// 	}
+	searchKey := c.Query("searchkey")
+	sortBY := c.Query("sortBY") // Add this line to get the sorting parameter
 
-// 	successRes := response.ClientResponse(http.StatusOK, "Product details retrieved successfully", product, nil)
-// 	c.JSON(http.StatusOK, successRes)
+	results, err := i.InventoryUseCase.SearchProducts(searchKey, page, limit, sortBY)
+	if err != nil {
+		errorRes := response.ClientResponse(http.StatusBadRequest, "could not retrieve the records", nil, err.Error())
+		c.JSON(http.StatusBadRequest, errorRes)
+		return
+	}
 
-// }
+	successRes := response.ClientResponse(http.StatusOK, "Successfully got all records", results, nil)
+	c.JSON(http.StatusOK, successRes)
+}
+
+// @Summary		View Inventory
+// @Description	View details of an inventory by ID
+// @Tags			Inventory
+// @Accept			json
+// @Produce		json
+// @Param			id	path	string	true	"Inventory ID"
+// @Security		Bearer
+// @Success		200	{object}	response.Response{}
+// @Failure		400	{object}	response.Response{}
+// @Router			/users/inventories/view/{id} [get]
+func (i *InventoryHandler) ViewInventory(c *gin.Context) {
+	// Extract inventory ID from path parameters
+	inventoryID := c.Param("id")
+
+	// Use the inventory ID to fetch details from the use case layer
+	inventory, err := i.InventoryUseCase.GetInventoryByID(inventoryID)
+	if err != nil {
+		errorRes := response.ClientResponse(http.StatusBadRequest, "Failed to fetch inventory details", nil, err.Error())
+		c.JSON(http.StatusBadRequest, errorRes)
+		return
+	}
+
+	// Respond with the fetched inventory details
+	successRes := response.ClientResponse(http.StatusOK, "Successfully fetched inventory details", inventory, nil)
+	c.JSON(http.StatusOK, successRes)
+}
