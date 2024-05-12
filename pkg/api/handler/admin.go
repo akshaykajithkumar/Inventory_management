@@ -179,7 +179,7 @@ func (i *AdminHandler) ChangeOrderStatus(c *gin.Context) {
 // @Security		Bearer
 // @Success		200	{object}	response.Response{}
 // @Failure		400	{object}	response.Response{}
-// @Router			/admin/user/stats [get]
+// @Router			/admin/stats/user [get]
 func (a *AdminHandler) UserStats(c *gin.Context) {
 	// Fetch user statistics using the UserStats use case function
 	userStats, err := a.adminUseCase.UserStats()
@@ -199,7 +199,7 @@ func (a *AdminHandler) UserStats(c *gin.Context) {
 // @Security		Bearer
 // @Success		200	{object}	response.Response{}
 // @Failure		400	{object}	response.Response{}
-// @Router			/admin/order/stats [get]
+// @Router			/admin/stats/order [get]
 func (a *AdminHandler) OrderStats(c *gin.Context) {
 	// Fetch order statistics using the OrderStats use case function
 	orderStats, err := a.adminUseCase.OrderStats()
@@ -219,7 +219,7 @@ func (a *AdminHandler) OrderStats(c *gin.Context) {
 // @Security		Bearer
 // @Success		200	{object}	response.Response{}
 // @Failure		400	{object}	response.Response{}
-// @Router			/admin/inventory/stats [get]
+// @Router			/admin/stats/inventory [get]
 func (a *AdminHandler) InventoryStats(c *gin.Context) {
 	// Fetch inventory statistics using the InventoryStats use case function
 	inventoryStats, err := a.adminUseCase.InventoryStats()

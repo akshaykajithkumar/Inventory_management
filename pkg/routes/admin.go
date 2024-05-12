@@ -27,5 +27,11 @@ func AdminRoutes(engine *gin.RouterGroup, adminHandler *handler.AdminHandler, in
 			orders.GET("/:id", adminHandler.GetOrder)
 			orders.PUT("/:id/status", adminHandler.ChangeOrderStatus)
 		}
+		stats := engine.Group("/stats")
+		{
+			stats.GET("/user", adminHandler.UserStats)
+			stats.GET("/order", adminHandler.OrderStats)
+			stats.GET("/inventory", adminHandler.InventoryStats)
+		}
 	}
 }
