@@ -138,7 +138,7 @@ func (i *InventoryHandler) DeleteInventory(c *gin.Context) {
 
 // @Summary		Search Products
 // @Description	client can search with a key and get the list of products similar to that key
-// @Tags			Products
+// @Tags			User
 // @Accept		json
 // @Produce		json
 // @Param		page	query  string 	true	"page"
@@ -147,7 +147,7 @@ func (i *InventoryHandler) DeleteInventory(c *gin.Context) {
 // @Param		sortBY	query  string 	false	"sortBY (asc/desc) - Sort by price in ascending (asc) or descending (desc) order"
 // @Success		200	{object}	response.Response{}
 // @Failure		400	{object}	response.Response{}
-// @Router		/products/search [get]
+// @Router		/users/products/search [get]
 func (i *InventoryHandler) SearchProducts(c *gin.Context) {
 	pageStr := c.Query("page")
 	page, err := strconv.Atoi(pageStr)
@@ -181,7 +181,7 @@ func (i *InventoryHandler) SearchProducts(c *gin.Context) {
 
 // @Summary		View Inventory
 // @Description	View details of an inventory by ID
-// @Tags			Inventory
+// @Tags			User
 // @Accept			json
 // @Produce		json
 // @Param			id	path	string	true	"Inventory ID"

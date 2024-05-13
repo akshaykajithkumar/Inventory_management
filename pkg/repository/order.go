@@ -26,7 +26,7 @@ func (a *orderRepository) GetOrders(userID, page, limit int) ([]domain.Order, er
 	query := `
         SELECT * FROM orders
         WHERE user_id = ? 
-        ORDER BY orderedAt DESC
+        ORDER BY ordered_at DESC
         LIMIT ? OFFSET ?
     `
 

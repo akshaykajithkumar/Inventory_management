@@ -61,7 +61,7 @@ func UserAuthMiddleware(c *gin.Context) {
 		return
 	}
 
-	id, ok := claims["userid"].(float64)
+	id, ok := claims["id"].(float64)
 	if !ok {
 		c.JSON(http.StatusForbidden, gin.H{"error": "Unauthorized access id"})
 		c.Abort()

@@ -186,7 +186,8 @@ func (o *adminRepository) AdminGetOrder(id int) (domain.Order, error) {
         SELECT
             id,
             user_id,
-            payment_id,
+            inventory_id,
+			quantity,
             price,
             ordered_at,
             order_status

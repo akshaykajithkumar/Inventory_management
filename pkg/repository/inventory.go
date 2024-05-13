@@ -126,24 +126,20 @@ func (a *inventoryRepository) SearchProducts(key string, page, limit int, sortBy
 	var query string
 	if sortBy == "asc" {
 		query = `
-            SELECT i.*
-            FROM inventories i
-            JOIN products p ON i.product_id = p.id
-            WHERE to_tsvector('english', p.product_name) @@ to_tsquery('english', ?)
-            ORDER BY i.price ASC
-            LIMIT ? OFFSET ?
-        `
+			 SELECT i.*
+			 FROM inventories i
+			 WHERE to_tsvector('english', i.product_name) @@ to_tsquery('english', ?)
+			 ORDER BY i.price ASC
+			 LIMIT ? OFFSET ?
+		 `
 	} else if sortBy == "desc" {
 		query = `
-            SELECT i.*
-            FROM inventories i
-            JOIN products p ON i.product_id = p.id
-            WHERE to_tsvector('english', p.product_name) @@ to_tsquery('english', ?)
-            ORDER BY i.price DESC
-            LIMIT ? OFFSET ?
-        `
-	} else {
-		return nil, errors.New("invalid sortBy parameter")
+			 SELECT i.*
+			 FROM inventories i
+			 WHERE to_tsvector('english', i.product_name) @@ to_tsquery('english', ?)
+			 ORDER BY i.price DESC
+			 LIMIT ? OFFSET ?
+		 `
 	}
 
 	// Execute the query

@@ -183,27 +183,6 @@ paths:
       summary: Update Stock
       tags:
       - Admin
-  /admin/inventory/stats:
-    get:
-      consumes:
-      - application/json
-      description: Fetch inventory statistics and return them as JSON.
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/response.Response'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/response.Response'
-      security:
-      - Bearer: []
-      summary: Get Inventory Statistics
-      tags:
-      - Admin
   /admin/logout:
     post:
       consumes:
@@ -221,27 +200,6 @@ paths:
           schema:
             $ref: '#/definitions/response.Response'
       summary: admin Logout
-      tags:
-      - Admin
-  /admin/order/stats:
-    get:
-      consumes:
-      - application/json
-      description: Fetch order statistics and return them as JSON.
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/response.Response'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/response.Response'
-      security:
-      - Bearer: []
-      summary: Get Order Statistics
       tags:
       - Admin
   /admin/orders:
@@ -344,7 +302,49 @@ paths:
       summary: Change Order Status
       tags:
       - Admin
-  /admin/user/stats:
+  /admin/stats/inventory:
+    get:
+      consumes:
+      - application/json
+      description: Fetch inventory statistics and return them as JSON.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Get Inventory Statistics
+      tags:
+      - Admin
+  /admin/stats/order:
+    get:
+      consumes:
+      - application/json
+      description: Fetch order statistics and return them as JSON.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Get Order Statistics
+      tags:
+      - Admin
+  /admin/stats/user:
     get:
       consumes:
       - application/json
@@ -365,47 +365,6 @@ paths:
       summary: Get User Statistics
       tags:
       - Admin
-  /products/search:
-    get:
-      consumes:
-      - application/json
-      description: client can search with a key and get the list of products similar
-        to that key
-      parameters:
-      - description: page
-        in: query
-        name: page
-        required: true
-        type: string
-      - description: limit
-        in: query
-        name: limit
-        required: true
-        type: string
-      - description: searchkey
-        in: query
-        name: searchkey
-        required: true
-        type: string
-      - description: sortBY (asc/desc) - Sort by price in ascending (asc) or descending
-          (desc) order
-        in: query
-        name: sortBY
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/response.Response'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/response.Response'
-      summary: Search Products
-      tags:
-      - Products
   /users/inventories/view/{id}:
     get:
       consumes:
@@ -432,7 +391,7 @@ paths:
       - Bearer: []
       summary: View Inventory
       tags:
-      - Inventory
+      - User
   /users/login:
     post:
       consumes:
@@ -478,6 +437,47 @@ paths:
       security:
       - Bearer: []
       summary: User Logout
+      tags:
+      - User
+  /users/products/search:
+    get:
+      consumes:
+      - application/json
+      description: client can search with a key and get the list of products similar
+        to that key
+      parameters:
+      - description: page
+        in: query
+        name: page
+        required: true
+        type: string
+      - description: limit
+        in: query
+        name: limit
+        required: true
+        type: string
+      - description: searchkey
+        in: query
+        name: searchkey
+        required: true
+        type: string
+      - description: sortBY (asc/desc) - Sort by price in ascending (asc) or descending
+          (desc) order
+        in: query
+        name: sortBY
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Search Products
       tags:
       - User
   /users/profile/orders:

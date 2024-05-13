@@ -30,22 +30,13 @@ func (c *userDatabase) CheckUserAvailability(email string) bool {
 	return count > 0
 }
 
-func (cr *userDatabase) UserBlockStatus(email string) (bool, error) {
-	var permission bool
-	err := cr.DB.Raw("select permission from users where email = ?", email).Scan(&permission).Error
-	if err != nil {
-		return false, err
-	}
-	return permission, nil
-}
-
 func (c *userDatabase) FindUserByEmail(user models.UserLogin) (models.UserResponse, error) {
 
 	var user_details models.UserResponse
 
 	err := c.DB.Raw(`
 		SELECT *
-		FROM users where email = ? and permission = true
+		FROM users where email = ? 
 		`, user.Email).Scan(&user_details).Error
 
 	if err != nil {
