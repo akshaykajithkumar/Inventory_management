@@ -2,6 +2,7 @@ package db
 
 import (
 	"fmt"
+	"log"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -24,19 +25,13 @@ func ConnectDatabase(cfg config.Config) (*gorm.DB, error) {
 	db.AutoMigrate(&domain.Order{})
 	db.AutoMigrate(&domain.OrderItem{})
 
-	// // Setup the triggers
-	// if err := db.Exec(placeOrderTriggerSQL).Error; err != nil {
-	// 	log.Printf("failed to setup place_order trigger: %v", err)
-	// 	return nil, err
-	// }
-
-	// if err := db.Exec(adjustPriceTriggerSQL).Error; err != nil {
-	// 	log.Printf("failed to setup adjust_price trigger: %v", err)
-	// 	return nil, err
-	// }
+	// Set up database triggers
+	if err := SetUpDBTriggers(db); err != nil {
+		return nil, err
+	}
 	// //setup the indexes
-	// if err := CreateIndexes(db); err != nil {
-	// 	log.Printf("failed to setup database indexes")
-	// }
+	if err := CreateIndexes(db); err != nil {
+		log.Printf("failed to setup database indexes")
+	}
 	return db, dbErr
 }
