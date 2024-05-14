@@ -118,60 +118,13 @@ func (i *inventoryRepository) CheckPrice(pid int) (float64, error) {
 	return k, nil
 }
 
-// func (a *inventoryRepository) SearchProducts(key string, page, limit int, sortBy string) ([]domain.Inventory, error) {
-// 	var inventories []domain.Inventory
-// 	offset := (page - 1) * limit
-
-// 	// Prepare the SQL query
-// 	var query string
-// 	if sortBy == "asc" {
-// 		query = `
-// 			 SELECT id, product_name, description, stock, price
-// 			 FROM inventories
-// 			 WHERE to_tsvector('english', product_name) @@ to_tsquery('english', ?)
-// 			 ORDER BY price ASC
-// 			 LIMIT ? OFFSET ?
-// 		 `
-// 	} else if sortBy == "desc" {
-// 		query = `
-// 			 SELECT id, product_name, description, stock, price
-// 			 FROM inventories
-// 			 WHERE to_tsvector('english', product_name) @@ to_tsquery('english', ?)
-// 			 ORDER BY price DESC
-// 			 LIMIT ? OFFSET ?
-// 		 `
-// 	}
-
-// 	// Execute the query
-// 	rows, err := a.DB.Raw(query, key, limit, offset).Rows()
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	defer rows.Close()
-
-// 	// Iterate through the rows and scan each into an Inventory struct
-// 	for rows.Next() {
-// 		var inventory domain.Inventory
-// 		if err := rows.Scan(&inventory.ID, &inventory.ProductName, &inventory.Description, &inventory.Stock, &inventory.Price); err != nil {
-// 			return nil, err
-// 		}
-// 		inventories = append(inventories, inventory)
-// 	}
-
-// 	if err := rows.Err(); err != nil {
-// 		return nil, err
-// 	}
-
-//		return inventories, nil
-//	}
 func (a *inventoryRepository) SearchProducts(key string, page, limit int, sortBy string) ([]domain.Inventory, error) {
 	var inventories []domain.Inventory
 	offset := (page - 1) * limit
 
-	// Prepare the search key for prefix matching
+	//  search key for prefix matching
 	searchKey := key + ":*"
 
-	// Prepare the SQL query
 	var query string
 	if sortBy == "asc" {
 		query = `
@@ -198,7 +151,7 @@ func (a *inventoryRepository) SearchProducts(key string, page, limit int, sortBy
 	}
 	defer rows.Close()
 
-	// Iterate through the rows and scan each into an Inventory struct
+	// Iterating through the rows and scan each into an Inventory struct
 	for rows.Next() {
 		var inventory domain.Inventory
 		if err := rows.Scan(&inventory.ID, &inventory.ProductName, &inventory.Description, &inventory.Stock, &inventory.Price); err != nil {

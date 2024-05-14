@@ -10,6 +10,5 @@ type InventoryUseCase interface {
 	UpdateInventory(invID int, invData models.UpdateInventory) (models.Inventory, error)
 	DeleteInventory(id string) error
 	GetInventoryByID(inventoryID string) (domain.Inventory, error)
-	//ListProducts(page int, limit int) ([]models.InventoryList, error)
 	SearchProducts(key string, page, limit int, sortBY string) ([]domain.Inventory, error)
 }

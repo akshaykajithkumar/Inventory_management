@@ -173,7 +173,7 @@ func (i *adminUseCase) ChangeOrderStatus(orderID, status string) error {
 		return errors.New("invalid status type")
 	}
 
-	// Call your repository method to change the order status
+	// Call repository method to change the order status
 	err := i.adminRepository.ChangeOrderStatus(orderID, status)
 	if err != nil {
 		return err

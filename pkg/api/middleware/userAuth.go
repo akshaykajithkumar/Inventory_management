@@ -12,11 +12,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-// type userKey string
-// func (k userKey) String() string {
-// 	return string(k)
-// }
-
 /*
 UserAuthMiddleware is a middleware for user authentication
 

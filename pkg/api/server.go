@@ -21,6 +21,7 @@ NewServerHTTP creates a new instance of ServerHTTP.
 Parameters:
 
 - inventoryHandler: A handler for inventory-related operations.
+
 - userHandler: A handler for user-related operations.
 
 - adminHandler: A handler for admin-related operations.
@@ -43,7 +44,7 @@ func NewServerHTTP(inventoryHandler *handler.InventoryHandler, userHandler *hand
 }
 
 /*
-Start starts the HTTP server and listens on port 1243.
+Start starts the HTTP server and listens on port 1233.
 */
 func (sh *ServerHTTP) Start() {
 	sh.engine.Run(":1233")

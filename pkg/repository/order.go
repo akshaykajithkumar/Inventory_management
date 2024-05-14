@@ -30,7 +30,6 @@ func (a *orderRepository) GetOrders(userID, page, limit int) ([]domain.Order, er
         LIMIT ? OFFSET ?
     `
 
-	// Execute the query
 	rows, err := a.DB.Raw(query, userID, limit, offset).Rows()
 	if err != nil {
 		return nil, err

@@ -8,7 +8,6 @@ import (
 type AdminRepository interface {
 	LoginHandler(adminDetails models.AdminLogin) (domain.Admin, error)
 	GetUserByID(id string) (domain.User, error)
-
 	GetUsers(page int, limit int) ([]models.UserDetailsAtAdmin, error)
 	AdminGetOrder(id int) (domain.Order, error)
 	ChangeOrderStatus(orderID, status string) error

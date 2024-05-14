@@ -33,18 +33,6 @@ type CustomDates struct {
 	EndDate      time.Time `json:"endDate"`
 }
 
-// type ProductData struct {
-// 	ProductName string  `json:"product_name" validate:"required,ascii"`
-// 	Description string  `json:"description" validate:"required,ascii"`
-// 	MinPrice    float32 `json:"min_price" validate:"required,min=1,number"`
-// 	MaxPrice    float32 `json:"max_price" validate:"required,gtfield=MinPrice,number"`
-// 	Image       string  `json:"image" validate:"required,ascii"`
-// 	Stock       int     `json:"stock" validate:"required,min=1,number"`
-// 	SellerId    int     `json:"seller_id" validate:"required,min=1,number"`
-// }
-
-//stats
-
 type UserStats struct {
 	TotalUsers            int
 	AverageRevenuePerUser float32
