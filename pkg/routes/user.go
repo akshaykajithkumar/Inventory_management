@@ -20,5 +20,5 @@ func UserRoutes(engine *gin.RouterGroup, userHandler *handler.UserHandler, order
 		engine.POST("/profile/orders/place", orderHandler.PlaceOrder)
 	}
 
-	engine.GET("/products/search", inventoryHandler.SearchProducts)
+	engine.GET("/products/search", inventoryHandler.UserSearchProducts)
 }

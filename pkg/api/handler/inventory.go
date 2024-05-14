@@ -137,7 +137,7 @@ func (i *InventoryHandler) DeleteInventory(c *gin.Context) {
 }
 
 // @Summary		Search Products
-// @Description	client can search with a key and get the list of products similar to that key
+// @Description	user can search with a key and get the list of products similar to that key
 // @Tags			User
 // @Accept		json
 // @Produce		json
@@ -148,7 +148,7 @@ func (i *InventoryHandler) DeleteInventory(c *gin.Context) {
 // @Success		200	{object}	response.Response{}
 // @Failure		400	{object}	response.Response{}
 // @Router		/users/products/search [get]
-func (i *InventoryHandler) SearchProducts(c *gin.Context) {
+func (i *InventoryHandler) UserSearchProducts(c *gin.Context) {
 	pageStr := c.Query("page")
 	page, err := strconv.Atoi(pageStr)
 	if err != nil {

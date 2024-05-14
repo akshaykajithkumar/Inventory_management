@@ -151,6 +151,64 @@
                 }
             }
         },
+        "/admin/inventories/search": {
+            "get": {
+                "description": "admin can search with a key and get the list of products similar to that key",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Search Products",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "page",
+                        "name": "page",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "limit",
+                        "name": "limit",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "searchkey",
+                        "name": "searchkey",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "sortBY (asc/desc) - Sort by price in ascending (asc) or descending (desc) order",
+                        "name": "sortBY",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/admin/inventories/update": {
             "patch": {
                 "security": [
@@ -609,7 +667,7 @@
         },
         "/users/products/search": {
             "get": {
-                "description": "client can search with a key and get the list of products similar to that key",
+                "description": "user can search with a key and get the list of products similar to that key",
                 "consumes": [
                     "application/json"
                 ],

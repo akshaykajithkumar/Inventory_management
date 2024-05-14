@@ -16,6 +16,7 @@ func AdminRoutes(engine *gin.RouterGroup, adminHandler *handler.AdminHandler, in
 
 		inventorymanagement := engine.Group("/inventories")
 		{
+			inventorymanagement.GET("search", inventoryHandler.SearchProducts)
 			inventorymanagement.POST("/add", inventoryHandler.AddInventory)
 			inventorymanagement.PATCH("/update", inventoryHandler.UpdateInventory)
 			inventorymanagement.DELETE("/delete", inventoryHandler.DeleteInventory)

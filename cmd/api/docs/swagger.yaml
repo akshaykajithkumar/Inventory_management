@@ -150,6 +150,47 @@ paths:
       summary: Delete Inventory
       tags:
       - Admin
+  /admin/inventories/search:
+    get:
+      consumes:
+      - application/json
+      description: admin can search with a key and get the list of products similar
+        to that key
+      parameters:
+      - description: page
+        in: query
+        name: page
+        required: true
+        type: string
+      - description: limit
+        in: query
+        name: limit
+        required: true
+        type: string
+      - description: searchkey
+        in: query
+        name: searchkey
+        required: true
+        type: string
+      - description: sortBY (asc/desc) - Sort by price in ascending (asc) or descending
+          (desc) order
+        in: query
+        name: sortBY
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Search Products
+      tags:
+      - Admin
   /admin/inventories/update:
     patch:
       consumes:
@@ -443,7 +484,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: client can search with a key and get the list of products similar
+      description: user can search with a key and get the list of products similar
         to that key
       parameters:
       - description: page

@@ -230,3 +230,46 @@ func (a *AdminHandler) InventoryStats(c *gin.Context) {
 
 	c.JSON(http.StatusOK, response.Response{Message: "Fetched inventoryStats", Data: inventoryStats})
 }
+
+// @Summary		Search Products
+// @Description	admin can search with a key and get the list of products similar to that key
+// @Tags			Admin
+// @Accept		json
+// @Produce		json
+// @Param		page	query  string 	true	"page"
+// @Param		limit	query  string 	true	"limit"
+// @Param		searchkey	query  string 	true	"searchkey"
+// @Param		sortBY	query  string 	false	"sortBY (asc/desc) - Sort by price in ascending (asc) or descending (desc) order"
+// @Success		200	{object}	response.Response{}
+// @Failure		400	{object}	response.Response{}
+// @Router		/admin/inventories/search [get]
+func (i *InventoryHandler) SearchProducts(c *gin.Context) {
+	pageStr := c.Query("page")
+	page, err := strconv.Atoi(pageStr)
+	if err != nil {
+		errorRes := response.ClientResponse(http.StatusBadRequest, "page number not in the right format", nil, err.Error())
+		c.JSON(http.StatusBadRequest, errorRes)
+		return
+	}
+
+	limitStr := c.Query("limit")
+	limit, err := strconv.Atoi(limitStr)
+	if err != nil {
+		errorRes := response.ClientResponse(http.StatusBadRequest, "limit number not in the right format", nil, err.Error())
+		c.JSON(http.StatusBadRequest, errorRes)
+		return
+	}
+
+	searchKey := c.Query("searchkey")
+	sortBY := c.Query("sortBY") // Add this line to get the sorting parameter
+
+	results, err := i.InventoryUseCase.SearchProducts(searchKey, page, limit, sortBY)
+	if err != nil {
+		errorRes := response.ClientResponse(http.StatusBadRequest, "could not retrieve the records", nil, err.Error())
+		c.JSON(http.StatusBadRequest, errorRes)
+		return
+	}
+
+	successRes := response.ClientResponse(http.StatusOK, "Successfully got all records", results, nil)
+	c.JSON(http.StatusOK, successRes)
+}
