@@ -60,9 +60,14 @@ Refresh Token and Access Token: Implemented secure authentication using JWT (JSO
 
 ### Indexing for Scalability and Search Performance
 
-User Table Indexing: Indexes are created on user ID and username columns to accelerate user-related queries such as login, profile retrieval, and authentication.
+Order Table Indexing: Indexes are strategically established on the order ID and user ID columns to streamline order-related operations, history retrieval, and user-specific order listings.
 
-Order Table Indexing: Indexes are established on order ID and user ID columns to optimize order-related operations such as tracking, history retrieval, and user-specific order listing.
+Inventory Table Indexing: To optimize product search functionality, an index has been implemented on the relevant columns in the inventory table, ensuring rapid access and improved search performance.
+
+### API Documentation
+- Swagger: All APIs are documented using Swagger, providing a comprehensive and interactive interface for exploring and testing API endpoints. Swagger documentation ensures clarity and ease of use for developers .
+
+
 
 Getting Started
 
@@ -98,6 +103,7 @@ APIs
 -  POST /admin/inventories/add: Add products.
 -  DELETE /admin/inventories/delete: Remove products.
 -  PUT /admin/inventories/update: Update product details.
+-  PUT /admin/inventories/search: admin can search products
 -  GET /admin/orders/list: View order lists.
 -  GET /admin/orders/:id :view specific order
 -  GET /admin/orders/:id/status :changing the order status
