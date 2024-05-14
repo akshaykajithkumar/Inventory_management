@@ -75,14 +75,14 @@ Getting Started
 
 ```bash
 Install and set up PostgreSQL.
-    Create a dev.env file in the /pkg/config directory.
-    Add PostgreSQL details to the dev.env file:
+    Create a .env file in the /pkg/config directory.
+    Add PostgreSQL details to the .env file:
         DB_HOST: PostgreSQL host name.
         DB_NAME: PostgreSQL database name.
         DB_USER: PostgreSQL user name.
         DB_PORT: PostgreSQL port number.
         DB_PASSWORD: PostgreSQL password.
-    Add a secret hash key to the dev.env file:
+    Add a secret hash key to the .env file:
         KEY: your secret hash key.
     Run go run cmd/main.go in the terminal.
 ```
